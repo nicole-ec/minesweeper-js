@@ -1,9 +1,7 @@
-//The following code was referenced from Pavol Federl's Lights Out game.
+//The following code was referenced from Pavol Federl's Lights Out game, with many changes.
 //Code used to detect if it's a mobile device: https://www.w3schools.com/howto/howto_js_media_queries.asp
 //Source for jquery mobile CDN: https://jquerymobile.com/download/
 //Timer code referenced from Emmanuel Onu's jsfiddle: https://jsfiddle.net/emmynex2007/wt2nx8f7/#
-
-
 let game = new MSGame();
 window.addEventListener('load', main);
 let startTime, endTime, longpress;
@@ -14,7 +12,7 @@ let startingGame = false;
 
 
 /**
- * creates the time for the game
+ * creates the timer for the game
  * - based on Emmanuel Onu's timer code
  * */
 function startTimer() {
@@ -32,8 +30,8 @@ function startTimer() {
 /**
  * creates largest board (24x20)
  * - assign correct mouse events based on screen size (ASSUMED MOBILE DEVICE SCREEN < 1024px)
- * 
- * @param {state} s 
+ *
+ * @param {state} s
  */
 function prepare_dom(s) {
     startingGame = true;
@@ -45,7 +43,7 @@ function prepare_dom(s) {
         card.setAttribute("data-cardInd", i);
         card.addEventListener("click", async () => {
             if (fireClick) {
-                card_click_cb(s, card, i, false);
+                squareClickCallback(s, card, i, false);
             }
             fireClick = true;
         });
@@ -56,7 +54,7 @@ function prepare_dom(s) {
             //I imported jquery mobile specifically for this one event ; _ ;
             $(card).on("taphold", function (e) {
                 fireClick = false;
-                card_click_cb(s, card, i, true);
+                squareClickCallback(s, card, i, true);
             });
             $(card).on("contextmenu", function (e) {
                 e.preventDefault();
@@ -66,7 +64,7 @@ function prepare_dom(s) {
             //right-click event
             card.addEventListener("contextmenu", (e) => {
                 e.preventDefault();
-                card_click_cb(s, card, i, true);
+                squareClickCallback(s, card, i, true);
             });
         }
 
@@ -80,8 +78,8 @@ function prepare_dom(s) {
  * - remove flags on uncovered safe squares
  * - show bombs if uncovered mine squares
  * - updates flag count
- * 
- * @param {object} s 
+ *
+ * @param {object} s
  */
 function render(gameState, card_div) {
     let index = 0;
@@ -137,23 +135,25 @@ function renderNewGame(s) {
 }
 
 /**
- * callback a square
+ * callback function for a square
  * - mark or uncover a square
  * - render new game state
  * - check for winning/losing condition
- * @param {state} s 
- * @param {HTMLElement} card_div 
- * @param {number} ind 
+ * @param {state} s
+ * @param {HTMLElement} card_div
+ * @param {number} ind
  */
-function card_click_cb(s, card_div, ind, mark) {
+function squareClickCallback(s, card_div, ind, mark) {
     const ncol = ind % s.ncols;
     const nrow = Math.floor(ind / s.ncols);
 
+    //if this is a new game, start the timer
     if (startingGame) {
         startTimer();
         startingGame = false;
     }
 
+    //do different things for flagging and uncovering a square
     if (mark) {
         let success = s.mark(nrow, ncol);
         let state = s.arr[nrow][ncol].state;
@@ -163,15 +163,35 @@ function card_click_cb(s, card_div, ind, mark) {
     else {
         s.uncover(nrow, ncol);
     }
+
     render(s, card_div);
     game.getStatus();
 
+    //check losing and winning conditions
     if (s.exploded) {
         document.querySelector("#overlay-lose").classList.toggle("active");
+        window.clearInterval(timer);
     }
     else if (isPlayerWin(s)) {
         document.querySelector("#overlay-win").classList.toggle("active");
+        showRemainingBombs(s)
+        window.clearInterval(timer);
     }
+}
+
+function showRemainingBombs(gameState) {
+  let index = 0;
+  for (let i = 0; i < gameState.arr.length; i++) {
+      for (let j = 0; j < gameState.arr[i].length; j++) {
+          square = gameState.arr[i][j];
+          //if the square is a mine and it's state is hidden, assign bomb img
+          if (square.state === "hidden" && square.mine) {
+              let element = document.querySelector(`[data-cardInd="${index}"]`);
+              element.style.backgroundImage = "url('bomb.png')";
+          }
+          index++;
+      }
+  }
 }
 
 /**
@@ -196,28 +216,41 @@ function isPlayerWin(gameState) {
 /**
  * callback for difficulty modes
  * - renders a new game with corresponding difficulty level
- * 
- * @param {state} s 
- * @param {number} cols 
- * @param {number} rows 
+ *
+ * @param {state} s
+ * @param {number} cols
+ * @param {number} rows
  */
-function button_cb(s, cols, rows, mines) {
+function menuButtonCallback(s, cols, rows, mines) {
     game.init(rows, cols, mines);
+
+    //set the number of flags available
+    document.querySelector("#flag-text").innerHTML = game.nmines;
+    window.clearInterval(timer);
+
+    //reset the timer
+    document.getElementById("timer-text").innerHTML = '000'
     renderNewGame(game);
+
+    startingGame = true;
+    t = 0;
 }
 
+/**
+  * This code adds event listeners and starts the game off on easy mode.
+  */
 function main() {
     // register callbacks for buttons
     document.querySelectorAll(".menuButton").forEach((button) => {
         [rows, cols] = button.getAttribute("data-size").split("x").map(s => Number(s));
         let mines = Number(button.getAttribute("mines"));
-        button.addEventListener("click", button_cb.bind(null, game, cols, rows, mines));
+        button.addEventListener("click", menuButtonCallback.bind(null, game, cols, rows, mines));
     });
 
     // callback for overlay click - hide overlay and regenerate game
     document.querySelectorAll(".overlay").forEach((overlay) => {
         overlay.addEventListener("click", () => {
-            button_cb(game, game.ncols, game.nrows, game.nmines);
+            menuButtonCallback(game, game.ncols, game.nrows, game.nmines);
             overlay.classList.remove("active");
         });
     });
@@ -225,9 +258,6 @@ function main() {
     // create enough cards for largest game and register click callbacks
     prepare_dom(game);
 
-    //set the number of flags available
-    document.querySelector("#flag-text").innerHTML = game.nmines;
-
     // simulate pressing 4x4 button to start new game
-    button_cb(game, game.ncols, game.nrows, game.nmines);
+    menuButtonCallback(game, game.ncols, game.nrows, game.nmines);
 }

@@ -1,3 +1,7 @@
+//This is Pavol Federl's minesweeper game engine.
+//I just commented the code at the bottom that provides a
+//demonstration of how the engine works.
+
 "use strict";
 
 let MSGame = (function () {
@@ -198,4 +202,3 @@ let MSGame = (function () {
 
 
 //console.log("end");
-
