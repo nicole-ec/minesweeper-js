@@ -10,15 +10,7 @@ body {
     background-color: #ffedb3 !important;
 }
 
-.ui-mobile {
-  background: transparent !important;
-}
-
-[data-role="page"] {
-  background: transparent !important;
-}
-
-.ui-page.ui-page-theme-a.ui-page-active {
+.ui-page-theme-a {
   background: transparent !important;
 }
 
