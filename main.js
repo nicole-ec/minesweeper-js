@@ -1,6 +1,5 @@
-//The following code was referenced from Pavol Federl's Lights Out game, with many changes.
+//The following code was referenced from Pavol Federl's Lights Out game, with many changes: https://gitlab.com/seng513/lights-out-game
 //Code used to detect if it's a mobile device: https://www.w3schools.com/howto/howto_js_media_queries.asp
-//Source for jquery mobile CDN: https://jquerymobile.com/download/
 //Timer code referenced from Emmanuel Onu's jsfiddle: https://jsfiddle.net/emmynex2007/wt2nx8f7/#
 let game = new MSGame();
 window.addEventListener('load', main);
@@ -179,6 +178,10 @@ function squareClickCallback(s, card_div, ind, mark) {
     }
 }
 
+/**
+  * Show remaining bombs
+  * - if the square state is hidden and it's a bomb, show the bomb
+  */
 function showRemainingBombs(gameState) {
   let index = 0;
   for (let i = 0; i < gameState.arr.length; i++) {
