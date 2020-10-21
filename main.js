@@ -32,42 +32,44 @@ function startTimer() {
  *
  * @param {state} s
  */
-function prepare_dom(s) {
+function createGame(s) {
     startingGame = true;
     const grid = document.querySelector(".grid");
-    const nCards = 24 * 20; // max grid size
-    for (let i = 0; i < nCards; i++) {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.setAttribute("data-cardInd", i);
-        card.addEventListener("click", async () => {
+    const nSquares = 24 * 20; // max grid size
+    for (let i = 0; i < nSquares; i++) {
+        const square = document.createElement("div");
+        square.className = "card";
+        square.setAttribute("data-cardInd", i);
+        square.addEventListener("click", async () => {
             if (fireClick) {
-                squareClickCallback(s, card, i, false);
+                squareClickCallback(s, square, i, false);
             }
             fireClick = true;
         });
 
+        //I accommodated for some tablet sizes so
+        //I check if its a mobile device if the max-width of resolution <= 1024 px
         let isMobile = window.matchMedia("(max-width: 1024px)");
 
         if (isMobile.matches) {
             //I imported jquery mobile specifically for this one event ; _ ;
-            $(card).on("taphold", function (e) {
+            $(square).on("taphold", function (e) {
                 fireClick = false;
-                squareClickCallback(s, card, i, true);
+                squareClickCallback(s, square, i, true);
             });
-            $(card).on("contextmenu", function (e) {
+            $(square).on("contextmenu", function (e) {
                 e.preventDefault();
             });
         }
         else {
-            //right-click event
-            card.addEventListener("contextmenu", (e) => {
+            //right-click event for desktop
+            square.addEventListener("contextmenu", (e) => {
                 e.preventDefault();
-                squareClickCallback(s, card, i, true);
+                squareClickCallback(s, square, i, true);
             });
         }
 
-        grid.appendChild(card);
+        grid.appendChild(square);
     }
 }
 
@@ -259,7 +261,7 @@ function main() {
     });
 
     // create enough cards for largest game and register click callbacks
-    prepare_dom(game);
+    createGame(game);
 
     // simulate pressing 4x4 button to start new game
     menuButtonCallback(game, game.ncols, game.nrows, game.nmines);
