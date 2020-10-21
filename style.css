@@ -7,8 +7,21 @@ URL: https://gitlab.com/seng513/lights-out-game
 }
 
 body {
-    background-color: #ffedb3;
+    background-color: #ffedb3 !important;
 }
+
+.ui-mobile {
+  background: transparent !important;
+}
+
+[data-role="page"] {
+  background: transparent !important;
+}
+
+.ui-page.ui-page-theme-a.ui-page-active {
+  background: transparent !important;
+}
+
 
 .card {
     background-color: #00bd65;
