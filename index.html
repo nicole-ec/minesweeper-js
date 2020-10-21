@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Attempt at Minesweeper :(</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+</head>
+
+<body>
+    <div class="menu">
+        <div class="menuButton" data-size="8x10" mines="10">Easy</div>
+        <div class="menuButton" data-size="14x18" mines="40">Medium</div>
+        <div class="menuButton" data-size="20x24" mines="99">Hard</div>
+
+        <div class="menuItem" id="flags">
+            <img src="flag.png" />
+            <div id="flag-text"></div>
+        </div>
+
+        <div class="menuItem" id="timer">
+            <img src="clock.png" />
+            <div id="timer-text">000</div>
+        </div>
+
+    </div>
+    <div class="gridwrapper">
+        <div class="grid"></div>
+    </div>
+    <div class="overlay" id="overlay-win">
+        <div class="overlayin">
+            <p class="big glow">Nice job!</p>
+            <p class="darker">Click anywhere to start a new game.
+        </div>
+    </div>
+    <div class="overlay" id="overlay-lose">
+        <div class="overlayin">
+            <p class="big glow">That's rough, buddy.</p>
+            <p class="darker">Click anywhere to start a new game.
+        </div>
+    </div>
+    <script src="msgame.js"></script>
+    <script src="main.js"></script>
+
+</body>
+
+</html>
